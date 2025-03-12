@@ -7,20 +7,29 @@ SDL_Renderer* renderer = NULL;
 int screenWidth = 640;
 int screenHeight = 480;
 
-float playerX = 2.5, playerY = 13;
+float playerX = 3, playerY = 2.5;
 float dirX = 0, dirY = -1;
 float planeX = .85, planeY = 0;
 
-int mapSize[] = {8, 8};
-int map[] = {
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 2, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 2, 0, 1,
-    1, 0, 0, 0, 0, 2, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 2, 2, 2, 1,
-    1, 2, 0, 0, 0, 0, 0, 1,
-    1, 1, 1, 1, 1, 1, 1, 1
+int map[8][8] = {
+    {1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 2, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 2, 0, 1},
+    {1, 0, 0, 0, 0, 2, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 2, 2, 2, 1},
+    {1, 2, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+int wallColors[][3] = {
+    {128, 0, 128},
+    {223, 12, 68},
+};
+
+void drawline(float x, float y1, float y2, int color0, int color1, int color2) {
+    SDL_SetRenderDrawColor(renderer, color0, color1, color2, SDL_ALPHA_OPAQUE);
+    SDL_RenderLine(renderer, x, y1, x, y2);
 };
 
 void raycast() {
@@ -72,8 +81,8 @@ void raycast() {
                 side = 1;
             }
 
-            if (map[(mapY * mapSize[1]) + mapX] != 0) {
-                hit = 1;
+            if (map[mapY][mapX]) {
+                hit = map[mapY][mapX];
             }
         }
         
@@ -85,14 +94,22 @@ void raycast() {
 
         float lineHeight = screenHeight / perpWallDist;
 
-        float drawStart = -lineHeight / 2 + screenHeight / 2;
-        float drawEnd = lineHeight / 2 + screenHeight / 2;
+        float drawStart = (-lineHeight / 2 + screenHeight / 2);
+        float drawEnd = (lineHeight / 2 + screenHeight / 2);
 
         drawStart = SDL_max(drawStart, 0);
         drawEnd = SDL_min(drawEnd, screenHeight - 1);
+
+        int color[] = {wallColors[hit - 1][0], wallColors[hit - 1][1], wallColors[hit - 1][2]};
+
+        if (side) {
+            color[0] = color[0] * .8;
+            color[1] = color[1] * .8;
+            color[2] = color[2] * .8;
+        }
         
+        drawline(x, drawStart, drawEnd, color[0], color[1], color[2]);
     }
-    
 }
 
 void loop() {
@@ -108,6 +125,7 @@ void loop() {
             }
         }
 
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
         raycast();
@@ -117,12 +135,6 @@ void loop() {
 }
 
 int main() {
-
-    int wallColors[] = {
-        128, 0, 128,
-        223, 12, 68,
-    };
-
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("initialization failed: %s\n", SDL_GetError());
     }
