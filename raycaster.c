@@ -32,8 +32,8 @@ int wallColors[][3] = {
     {223, 12, 68},
 };
 
-void drawline(double x, double y1, double y2, int color0, int color1, int color2) {
-    SDL_SetRenderDrawColor(renderer, color0, color1, color2, SDL_ALPHA_OPAQUE);
+void drawline(double x, double y1, double y2, int color[]) {
+    SDL_SetRenderDrawColor(renderer, color[0], color[1], color[2], SDL_ALPHA_OPAQUE);
     SDL_RenderLine(renderer, x, y1, x, y2);
 };
 
@@ -113,7 +113,7 @@ void raycast() {
             color[2] = color[2] * .8;
         }
         
-        drawline(x, drawStart, drawEnd, color[0], color[1], color[2]);
+        drawline(x, drawStart, drawEnd, color);
     }
 }
 
