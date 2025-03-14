@@ -4,14 +4,12 @@
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
-int screenWidth = 640;
-int screenHeight = 480;
+#define mapWidth 8
+#define mapHeight 8
+#define screenWidth 640
+#define screenHeight 480
 
-float playerX = 3, playerY = 2.5;
-float dirX = 0, dirY = -1;
-float planeX = .85, planeY = 0;
-
-int map[8][8] = {
+int map[mapWidth][mapHeight] = {
     {1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 2, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 2, 0, 1},
@@ -22,32 +20,39 @@ int map[8][8] = {
     {1, 1, 1, 1, 1, 1, 1, 1}
 };
 
+double playerX = 3, playerY = 2.5;
+double dirX = 0, dirY = -1;
+double planeX = .85, planeY = 0;
+
+double time = 0;
+double oldTime = 0;
+
 int wallColors[][3] = {
     {128, 0, 128},
     {223, 12, 68},
 };
 
-void drawline(float x, float y1, float y2, int color0, int color1, int color2) {
+void drawline(double x, double y1, double y2, int color0, int color1, int color2) {
     SDL_SetRenderDrawColor(renderer, color0, color1, color2, SDL_ALPHA_OPAQUE);
     SDL_RenderLine(renderer, x, y1, x, y2);
 };
 
 void raycast() {
     for (int x = 0; x < screenWidth; x++) {
-        float cameraX = 2 * x / screenWidth - 1;
+        double cameraX = 2 * x / screenWidth - 1;
 
-        float rayDirX = dirX + planeX * cameraX;
-        float rayDirY = dirY + planeY * cameraX;
+        double rayDirX = dirX + planeX * cameraX;
+        double rayDirY = dirY + planeY * cameraX;
 
         int mapX = SDL_floor(playerX);
         int mapY = SDL_floor(playerY);
 
-        float sideDistX, sideDistY;
+        double sideDistX, sideDistY;
 
-        float deltaDistX = SDL_abs(1 / rayDirX);
-        float deltaDistY = SDL_abs(1 / rayDirY);
+        double deltaDistX = (rayDirX == 0) ? 1e30 : SDL_abs(1 / rayDirX);
+        double deltaDistY = (rayDirY == 0) ? 1e30 : SDL_abs(1 / rayDirY);
 
-        float perpWallDist;
+        double perpWallDist;
 
         int stepX, stepY;
 
@@ -92,10 +97,10 @@ void raycast() {
             perpWallDist = sideDistY - deltaDistY;
         }
 
-        float lineHeight = screenHeight / perpWallDist;
+        double lineHeight = screenHeight / perpWallDist;
 
-        float drawStart = (-lineHeight / 2 + screenHeight / 2);
-        float drawEnd = (lineHeight / 2 + screenHeight / 2);
+        double drawStart = (-lineHeight / 2 + screenHeight / 2);
+        double drawEnd = (lineHeight / 2 + screenHeight / 2);
 
         drawStart = SDL_max(drawStart, 0);
         drawEnd = SDL_min(drawEnd, screenHeight - 1);
