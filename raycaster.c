@@ -117,6 +117,65 @@ void raycast() {
     }
 }
 
+void movePlayer(int inputs[]) {
+    oldTime = time;
+    time = SDL_GetTicks();
+    double deltaTime = (time - oldTime) / 1000.0;
+
+    double moveSpeed = deltaTime * 5.0;
+    double rotateSpeed = deltaTime * 2.5;
+
+    // i should change this to something that gets calculated depending on moveSpeed instead of a hardcoded value that only works with a moveSpeed of 5
+    double diagonalPenalty = 0.708;
+
+    if (inputs[0] && inputs[1] && !inputs[3] ||
+        inputs[0] && inputs[3] && !inputs[1] ||
+        inputs[2] && inputs[1] && !inputs[3] ||
+        inputs[2] && inputs[3] && !inputs[1]
+    ) {
+        moveSpeed = moveSpeed * diagonalPenalty;
+    }
+
+    // there has to be a better way to do this
+    if (inputs[0]) {
+        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirX * moveSpeed)] == 0) { playerX += dirX * moveSpeed; }
+        if (map[(int)SDL_floor(playerY + dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirY * moveSpeed; }      
+    }
+
+    if (inputs[1]) {
+        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirX * moveSpeed)] == 0) { playerX -= dirX * moveSpeed; }
+        if (map[(int)SDL_floor(playerY - dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirY * moveSpeed; }      
+    }
+
+    if (inputs[2]) {
+        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirX * moveSpeed)] == 0) { playerX += dirX * moveSpeed; }
+        if (map[(int)SDL_floor(playerY - dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirY * moveSpeed; }      
+    }
+
+    if (inputs[3]) {
+        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirX * moveSpeed)] == 0) { playerX -= dirX * moveSpeed; }
+        if (map[(int)SDL_floor(playerY + dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirY * moveSpeed; }      
+    }
+
+    if (inputs[4]) {
+        double oldDirX = dirX;
+        dirX = dirX * SDL_cos(-rotateSpeed) - dirY * SDL_sin(-rotateSpeed);
+        dirY = oldDirX * SDL_sin(-rotateSpeed) + dirY * SDL_cos(-rotateSpeed);
+        double oldPlaneX = planeX;
+        planeX = planeX * SDL_cos(-rotateSpeed) - planeY * SDL_sin(-rotateSpeed);
+        planeY = oldPlaneX * SDL_sin(-rotateSpeed) + planeY * SDL_cos(-rotateSpeed);
+    }
+
+    if (inputs[5]) {
+        double oldDirX = dirX;
+        dirX = dirX * SDL_cos(rotateSpeed) - dirY * SDL_sin(rotateSpeed);
+        dirY = oldDirX * SDL_sin(rotateSpeed) + dirY * SDL_cos(rotateSpeed);
+        double oldPlaneX = planeX;
+        planeX = planeX * SDL_cos(rotateSpeed) - planeY * SDL_sin(rotateSpeed);
+        planeY = oldPlaneX * SDL_sin(rotateSpeed) + planeY * SDL_cos(rotateSpeed);
+    }
+}
+
 void loop() {
     SDL_Event e;
     SDL_zero(e);
@@ -124,16 +183,49 @@ void loop() {
     bool quit = false;
 
     while (!quit) {
+        // w, a, s, d, arrow left, arrow right
+        int inputs[] = {0, 0, 0, 0, 0, 0};
+        
         while(SDL_PollEvent(&e)) {
-            if(e.type == SDL_EVENT_QUIT) {
+            if (e.type == SDL_EVENT_QUIT ||
+                e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_ESCAPE
+            ) {
                 quit = true;
             }
+
+            if (e.type == SDL_EVENT_KEY_DOWN) {
+                switch (e.key.scancode) {
+                    case SDL_SCANCODE_W:
+                        inputs[0] = 1;
+                        break;
+                    case SDL_SCANCODE_A:
+                        inputs[1] = 1;
+                        break;
+                    case SDL_SCANCODE_S:
+                        inputs[2] = 1;
+                        break;
+                    case SDL_SCANCODE_D:
+                        inputs[3] = 1;
+                        break;
+                    case SDL_SCANCODE_LEFT:
+                        inputs[4] = 1;
+                        break;
+                    case SDL_SCANCODE_RIGHT:
+                        inputs[5] = 1;
+                        break;
+                    
+                    default:
+                        break;
+                }
+            }
+            
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
         raycast();
+        movePlayer(inputs);
 
         SDL_RenderPresent(renderer);
     } 
