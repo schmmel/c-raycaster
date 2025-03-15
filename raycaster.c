@@ -20,7 +20,7 @@ int map[mapWidth][mapHeight] = {
     {1, 1, 1, 1, 1, 1, 1, 1}
 };
 
-double playerX = 3, playerY = 2.5;
+double playerX = 4, playerY = 4;
 double dirX = 0, dirY = -1;
 double planeX = .85, planeY = 0;
 
@@ -31,6 +31,8 @@ int wallColors[][3] = {
     {128, 0, 128},
     {223, 12, 68},
 };
+
+int inputs[] = {0, 0, 0, 0, 0, 0};
 
 void drawline(double x, double y1, double y2, int color[]) {
     SDL_SetRenderDrawColor(renderer, color[0], color[1], color[2], SDL_ALPHA_OPAQUE);
@@ -97,13 +99,16 @@ void raycast() {
             perpWallDist = sideDistY - deltaDistY;
         }
 
-        double lineHeight = screenHeight / perpWallDist;
+        int lineHeight = (int)(screenHeight / perpWallDist);
 
-        double drawStart = (-lineHeight / 2 + screenHeight / 2);
-        double drawEnd = (lineHeight / 2 + screenHeight / 2);
+        int drawStart = -lineHeight / 2 + screenHeight / 2;
+        int drawEnd = lineHeight / 2 + screenHeight / 2;
 
-        drawStart = SDL_max(drawStart, 0);
-        drawEnd = SDL_min(drawEnd, screenHeight - 1);
+        if (drawStart < 0) { drawStart = 0; }
+        if (drawEnd >= screenHeight) { drawEnd = screenHeight - 1; }
+
+        // drawStart = SDL_max(drawStart, 0);
+        // drawEnd = SDL_min(drawEnd, screenHeight - 1);
 
         int color[] = {wallColors[hit - 1][0], wallColors[hit - 1][1], wallColors[hit - 1][2]};
 
@@ -117,7 +122,7 @@ void raycast() {
     }
 }
 
-void movePlayer(int inputs[]) {
+void movePlayer() {
     oldTime = time;
     time = SDL_GetTicks();
     double deltaTime = (time - oldTime) / 1000.0;
@@ -184,7 +189,6 @@ void loop() {
 
     while (!quit) {
         // w, a, s, d, arrow left, arrow right
-        int inputs[] = {0, 0, 0, 0, 0, 0};
         
         while(SDL_PollEvent(&e)) {
             if (e.type == SDL_EVENT_QUIT ||
@@ -212,6 +216,32 @@ void loop() {
                         break;
                     case SDL_SCANCODE_RIGHT:
                         inputs[5] = 1;
+                        break;
+                    
+                    default:
+                        break;
+                }
+            }
+
+            if (e.type == SDL_EVENT_KEY_UP) {
+                switch (e.key.scancode) {
+                    case SDL_SCANCODE_W:
+                        inputs[0] = 0;
+                        break;
+                    case SDL_SCANCODE_A:
+                        inputs[1] = 0;
+                        break;
+                    case SDL_SCANCODE_S:
+                        inputs[2] = 0;
+                        break;
+                    case SDL_SCANCODE_D:
+                        inputs[3] = 0;
+                        break;
+                    case SDL_SCANCODE_LEFT:
+                        inputs[4] = 0;
+                        break;
+                    case SDL_SCANCODE_RIGHT:
+                        inputs[5] = 0;
                         break;
                     
                     default:
