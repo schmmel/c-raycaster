@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "*.to": "slomescript",
+        "coroutine": "c",
+        "sdl.h": "c",
+        "cmath": "c"
+    }
+}

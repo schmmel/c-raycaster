@@ -20,176 +20,36 @@ int map[mapWidth][mapHeight] = {
     {1, 1, 1, 1, 1, 1, 1, 1}
 };
 
-double playerX = 4, playerY = 4;
-double dirX = 0, dirY = -1;
-double planeX = .85, planeY = 0;
-
-double time = 0;
-double oldTime = 0;
-
 int wallColors[][3] = {
     {128, 0, 128},
     {223, 12, 68},
 };
 
+// w, a, s, d, arrow left, arrow right
 int inputs[] = {0, 0, 0, 0, 0, 0};
 
-void drawline(double x, double y1, double y2, int color[]) {
-    SDL_SetRenderDrawColor(renderer, color[0], color[1], color[2], SDL_ALPHA_OPAQUE);
-    SDL_RenderLine(renderer, x, y1, x, y2);
-};
+int main() {
+    double playerX = 2.5, playerY = 2.5;
+    double dirX = -1, dirY = 0;
+    double planeX = 0, planeY = 0.66;
 
-void raycast() {
-    for (int x = 0; x < screenWidth; x++) {
-        double cameraX = 2 * x / screenWidth - 1;
+    double time = 0;
+    double oldTime = 0;
 
-        double rayDirX = dirX + planeX * cameraX;
-        double rayDirY = dirY + planeY * cameraX;
-
-        int mapX = SDL_floor(playerX);
-        int mapY = SDL_floor(playerY);
-
-        double sideDistX, sideDistY;
-
-        double deltaDistX = (rayDirX == 0) ? 1e30 : SDL_abs(1 / rayDirX);
-        double deltaDistY = (rayDirY == 0) ? 1e30 : SDL_abs(1 / rayDirY);
-
-        double perpWallDist;
-
-        int stepX, stepY;
-
-        int hit = 0;
-        int side;
-
-        if (rayDirX < 0) {
-            stepX = -1;
-            sideDistX = (playerX - mapX) * deltaDistX;
-        } else {
-            stepX = 1;
-            sideDistX = (mapX + 1 - playerX) * deltaDistX;
-        }
-
-        if (rayDirY < 0) {
-            stepY = -1;
-            sideDistY = (playerY - mapY) * deltaDistY;
-        } else {
-            stepY = 1;
-            sideDistY = (mapY + 1 - playerY) * deltaDistY;
-        };
-
-        while (hit == 0) {
-            if (sideDistX < sideDistY) {
-                sideDistX += deltaDistX;
-                mapX += stepX;
-                side = 0;
-            } else {
-                sideDistY += deltaDistY;
-                mapY += stepY;
-                side = 1;
-            }
-
-            if (map[mapY][mapX]) {
-                hit = map[mapY][mapX];
-            }
-        }
-        
-        if (side == 0) {
-            perpWallDist = sideDistX - deltaDistX;
-        } else {
-            perpWallDist = sideDistY - deltaDistY;
-        }
-
-        int lineHeight = (int)(screenHeight / perpWallDist);
-
-        int drawStart = -lineHeight / 2 + screenHeight / 2;
-        int drawEnd = lineHeight / 2 + screenHeight / 2;
-
-        if (drawStart < 0) { drawStart = 0; }
-        if (drawEnd >= screenHeight) { drawEnd = screenHeight - 1; }
-
-        // drawStart = SDL_max(drawStart, 0);
-        // drawEnd = SDL_min(drawEnd, screenHeight - 1);
-
-        int color[] = {wallColors[hit - 1][0], wallColors[hit - 1][1], wallColors[hit - 1][2]};
-
-        if (side) {
-            color[0] = color[0] * .8;
-            color[1] = color[1] * .8;
-            color[2] = color[2] * .8;
-        }
-        
-        drawline(x, drawStart, drawEnd, color);
-    }
-}
-
-void movePlayer() {
-    oldTime = time;
-    time = SDL_GetTicks();
-    double deltaTime = (time - oldTime) / 1000.0;
-
-    double moveSpeed = deltaTime * 5.0;
-    double rotateSpeed = deltaTime * 2.5;
-
-    // i should change this to something that gets calculated depending on moveSpeed instead of a hardcoded value that only works with a moveSpeed of 5
-    double diagonalPenalty = 0.708;
-
-    if (inputs[0] && inputs[1] && !inputs[3] ||
-        inputs[0] && inputs[3] && !inputs[1] ||
-        inputs[2] && inputs[1] && !inputs[3] ||
-        inputs[2] && inputs[3] && !inputs[1]
-    ) {
-        moveSpeed = moveSpeed * diagonalPenalty;
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("initialization failed: %s\n", SDL_GetError());
     }
 
-    // there has to be a better way to do this
-    if (inputs[0]) {
-        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirX * moveSpeed)] == 0) { playerX += dirX * moveSpeed; }
-        if (map[(int)SDL_floor(playerY + dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirY * moveSpeed; }      
+    if (!SDL_CreateWindowAndRenderer("epic window :fire: :flag_tf:", screenWidth, screenHeight, 0, &window, &renderer)) {
+        SDL_Log("create window/renderer failed: %s", SDL_GetError());
     }
 
-    if (inputs[1]) {
-        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirX * moveSpeed)] == 0) { playerX -= dirX * moveSpeed; }
-        if (map[(int)SDL_floor(playerY - dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirY * moveSpeed; }      
-    }
-
-    if (inputs[2]) {
-        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirX * moveSpeed)] == 0) { playerX += dirX * moveSpeed; }
-        if (map[(int)SDL_floor(playerY - dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirY * moveSpeed; }      
-    }
-
-    if (inputs[3]) {
-        if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirX * moveSpeed)] == 0) { playerX -= dirX * moveSpeed; }
-        if (map[(int)SDL_floor(playerY + dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirY * moveSpeed; }      
-    }
-
-    if (inputs[4]) {
-        double oldDirX = dirX;
-        dirX = dirX * SDL_cos(-rotateSpeed) - dirY * SDL_sin(-rotateSpeed);
-        dirY = oldDirX * SDL_sin(-rotateSpeed) + dirY * SDL_cos(-rotateSpeed);
-        double oldPlaneX = planeX;
-        planeX = planeX * SDL_cos(-rotateSpeed) - planeY * SDL_sin(-rotateSpeed);
-        planeY = oldPlaneX * SDL_sin(-rotateSpeed) + planeY * SDL_cos(-rotateSpeed);
-    }
-
-    if (inputs[5]) {
-        double oldDirX = dirX;
-        dirX = dirX * SDL_cos(rotateSpeed) - dirY * SDL_sin(rotateSpeed);
-        dirY = oldDirX * SDL_sin(rotateSpeed) + dirY * SDL_cos(rotateSpeed);
-        double oldPlaneX = planeX;
-        planeX = planeX * SDL_cos(rotateSpeed) - planeY * SDL_sin(rotateSpeed);
-        planeY = oldPlaneX * SDL_sin(rotateSpeed) + planeY * SDL_cos(rotateSpeed);
-    }
-}
-
-void loop() {
     SDL_Event e;
     SDL_zero(e);
 
     bool quit = false;
 
     while (!quit) {
-        // w, a, s, d, arrow left, arrow right
-        
         while(SDL_PollEvent(&e)) {
             if (e.type == SDL_EVENT_QUIT ||
                 e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_ESCAPE
@@ -248,29 +108,157 @@ void loop() {
                         break;
                 }
             }
-            
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
-        raycast();
-        movePlayer(inputs);
+        for (int x = 0; x < screenWidth; x++) {
+            double cameraX = 2 * x / (double) screenWidth - 1;
+            double rayDirX = dirX + planeX * cameraX;
+            double rayDirY = dirY + planeY * cameraX;
+    
+            int mapX = (int) playerX;
+            int mapY = (int) playerY;
+    
+            double sideDistX;
+            double sideDistY;
+    
+            double deltaDistX = (rayDirX == 0) ? 1e30 : SDL_abs(1 / rayDirX);
+            double deltaDistY = (rayDirY == 0) ? 1e30 : SDL_abs(1 / rayDirY);
+            double perpWallDist;
+    
+            int stepX;
+            int stepY;
+    
+            int hit = 0;
+            int side;
+    
+            if (rayDirX < 0) {
+                stepX = -1;
+                sideDistX = (playerX - mapX) * deltaDistX;
+            } else {
+                stepX = 1;
+                sideDistX = (mapX + 1.0 - playerX) * deltaDistX;
+            }
+    
+            if (rayDirY < 0) {
+                stepY = -1;
+                sideDistY = (playerY - mapY) * deltaDistY;
+            } else {
+                stepY = 1;
+                sideDistY = (mapY + 1.0 - playerY) * deltaDistY;
+            }
+    
+            while (hit == 0) {
+                if (sideDistX < sideDistY) {
+                    sideDistX += deltaDistX;
+                    mapX += stepX;
+                    side = 0;
+                } else {
+                    sideDistY += deltaDistY;
+                    mapY += stepY;
+                    side = 1;
+                }
+                
+                if (map[mapX][mapY] > 0) {
+                    hit = map[mapX][mapY];
+                }
+            }
+    
+            if (side == 0) {
+                perpWallDist = (sideDistX - deltaDistX);
+            } else {
+                perpWallDist = (sideDistY - deltaDistY);
+            }
+    
+            int lineHeight = (int) (screenHeight / perpWallDist);
+    
+            int drawStart = -lineHeight / 2 + screenHeight / 2;
+            if (drawStart < 0) {
+                drawStart = 0;
+            }
+            int drawEnd = lineHeight / 2 + screenHeight / 2;
+            if (drawEnd >= screenHeight) {
+                drawEnd = screenHeight - 1;
+            }
+    
+            int color[] = {wallColors[hit - 1][0], wallColors[hit - 1][1], wallColors[hit - 1][2]};
+    
+            if (side) {
+                color[0] = color[0] * .8;
+                color[1] = color[1] * .8;
+                color[2] = color[2] * .8;
+            }
+    
+            SDL_SetRenderDrawColor(renderer, color[0], color[1], color[2], SDL_ALPHA_OPAQUE);
+            SDL_RenderLine(renderer, x, drawStart, x, drawEnd);
+        }
 
         SDL_RenderPresent(renderer);
-    } 
-}
 
-int main() {
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        SDL_Log("initialization failed: %s\n", SDL_GetError());
+        oldTime = time;
+        time = SDL_GetTicks();
+        double deltaTime = (time - oldTime) / 1000;
+
+        double moveSpeed = deltaTime * 5.0;
+        double rotateSpeed = deltaTime * 3.0;
+
+        double diagonalPenalty = 0.708;
+
+        if (inputs[0] && inputs[1] && !inputs[3] ||
+            inputs[0] && inputs[3] && !inputs[1] ||
+            inputs[2] && inputs[1] && !inputs[3] ||
+            inputs[2] && inputs[3] && !inputs[1]
+        ) {
+            moveSpeed = moveSpeed * diagonalPenalty;
+        }
+
+        // forward
+        if (inputs[0]) {
+            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirX * moveSpeed)] == 0) { playerX += dirX * moveSpeed; }
+            if (map[(int)SDL_floor(playerY + dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirY * moveSpeed; }      
+        }
+
+        // left
+        if (inputs[1]) {
+            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirY * moveSpeed)] == 0) { playerX -= dirY * moveSpeed; }
+            if (map[(int)SDL_floor(playerY + dirX * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirX * moveSpeed; }      
+        }
+    
+        // backward
+        if (inputs[2]) {
+            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirX * moveSpeed)] == 0) { playerX -= dirX * moveSpeed; }
+            if (map[(int)SDL_floor(playerY - dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirY * moveSpeed; }      
+        }
+    
+        // right
+        if (inputs[3]) {
+            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirY * moveSpeed)] == 0) { playerX += dirY * moveSpeed; }
+            if (map[(int)SDL_floor(playerY - dirX * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirX * moveSpeed; }    
+        }
+
+        // why no worky
+        // // rotate left
+        // if (inputs[4]) {
+        //     double oldDirX = dirX;
+        //     dirX = dirX * SDL_cos(-rotateSpeed) - dirY * SDL_sin(-rotateSpeed);
+        //     dirY = oldDirX * SDL_sin(-rotateSpeed) + dirY * SDL_cos(-rotateSpeed);
+        //     double oldPlaneX = planeX;
+        //     planeX = planeX * SDL_cos(-rotateSpeed) - planeY * SDL_sin(-rotateSpeed);
+        //     planeY = oldPlaneX * SDL_sin(-rotateSpeed) + planeY * SDL_cos(-rotateSpeed);
+        // }
+
+        // // rotate right
+        // if (inputs[5]) {
+        //     double oldDirX = dirX;
+        //     dirX = dirX * SDL_cos(rotateSpeed) - dirY * SDL_sin(rotateSpeed);
+        //     dirY = oldDirX * SDL_sin(rotateSpeed) + dirY * SDL_cos(rotateSpeed);
+        //     double oldPlaneX = planeX;
+        //     planeX = planeX * SDL_cos(rotateSpeed) - planeY * SDL_sin(rotateSpeed);
+        //     planeY = oldPlaneX * SDL_sin(rotateSpeed) + planeY * SDL_cos(rotateSpeed);
+        // }
     }
-
-    if (!SDL_CreateWindowAndRenderer("epic window :fire: :flag_tf:", screenWidth, screenHeight, 0, &window, &renderer)) {
-        SDL_Log("create window/renderer failed: %s", SDL_GetError());
-    }
-
-    loop();
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
