@@ -216,26 +216,26 @@ int main() {
 
         // forward
         if (inputs[0]) {
-            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirX * moveSpeed)] == 0) { playerX += dirX * moveSpeed; }
-            if (map[(int)SDL_floor(playerY + dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirY * moveSpeed; }      
+            if (map[(int)SDL_floor(playerX + dirX * moveSpeed)][(int)SDL_floor(playerY)] == 0) { playerX += dirX * moveSpeed; }
+            if (map[(int)SDL_floor(playerX)][(int)SDL_floor(playerY + dirY * moveSpeed)] == 0) { playerY += dirY * moveSpeed; }
         }
 
         // left
         if (inputs[1]) {
-            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirY * moveSpeed)] == 0) { playerX -= dirY * moveSpeed; }
-            if (map[(int)SDL_floor(playerY + dirX * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY += dirX * moveSpeed; }      
+            if (map[(int)SDL_floor(playerX - dirY * moveSpeed)][(int)SDL_floor(playerY)] == 0) { playerX -= dirY * moveSpeed; }      
+            if (map[(int)SDL_floor(playerX)][(int)SDL_floor(playerY + dirX * moveSpeed)] == 0) { playerY += dirX * moveSpeed; }
         }
     
         // backward
         if (inputs[2]) {
-            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX - dirX * moveSpeed)] == 0) { playerX -= dirX * moveSpeed; }
-            if (map[(int)SDL_floor(playerY - dirY * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirY * moveSpeed; }      
+            if (map[(int)SDL_floor(playerX - dirX * moveSpeed)][(int)SDL_floor(playerY)] == 0) { playerX -= dirX * moveSpeed; }
+            if (map[(int)SDL_floor(playerX)][(int)SDL_floor(playerY - dirY * moveSpeed)] == 0) { playerY -= dirY * moveSpeed; }
         }
     
         // right
         if (inputs[3]) {
-            if (map[(int)SDL_floor(playerY)][(int)SDL_floor(playerX + dirY * moveSpeed)] == 0) { playerX += dirY * moveSpeed; }
-            if (map[(int)SDL_floor(playerY - dirX * moveSpeed)][(int)SDL_floor(playerX)] == 0) { playerY -= dirX * moveSpeed; }    
+            if (map[(int)SDL_floor(playerX + dirY * moveSpeed)][(int)SDL_floor(playerY)] == 0) { playerX += dirY * moveSpeed; }    
+            if (map[(int)SDL_floor(playerX)][(int)SDL_floor(playerY - dirX * moveSpeed)] == 0) { playerY -= dirX * moveSpeed; }   
         }
 
         // why no worky
