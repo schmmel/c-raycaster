@@ -43,6 +43,9 @@ int main() {
     if (!SDL_CreateWindowAndRenderer("epic window :fire: :flag_tf:", screenWidth, screenHeight, 0, &window, &renderer)) {
         SDL_Log("create window/renderer failed: %s", SDL_GetError());
     }
+    
+    // grab mouse
+    SDL_SetWindowMouseGrab(window, true);
 
     SDL_Event e;
     SDL_zero(e);
@@ -77,7 +80,7 @@ int main() {
                     case SDL_SCANCODE_RIGHT:
                         inputs[5] = 1;
                         break;
-                    
+                        
                     default:
                         break;
                 }
@@ -107,6 +110,10 @@ int main() {
                     default:
                         break;
                 }
+            }
+        
+            if (e.type == SDL_EVENT_MOUSE_MOTION) {
+                SDL_Log("%lf", e.motion.x);
             }
         }
 
