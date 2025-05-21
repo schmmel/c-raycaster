@@ -131,8 +131,8 @@ int main() {
             double sideDistX;
             double sideDistY;
     
-            double deltaDistX = (rayDirX == 0) ? 1e30 : SDL_abs(1 / rayDirX);
-            double deltaDistY = (rayDirY == 0) ? 1e30 : SDL_abs(1 / rayDirY);
+            double deltaDistX = (rayDirX == 0) ? 1e30 : SDL_fabs(1 / rayDirX);
+            double deltaDistY = (rayDirY == 0) ? 1e30 : SDL_fabs(1 / rayDirY);
             double perpWallDist;
     
             int stepX;
