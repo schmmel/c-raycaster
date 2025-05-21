@@ -1,6 +1,8 @@
 #include "raylib.h"
 #include <math.h>
 
+#include <stdio.h>
+
 #define screenWidth 640
 #define screenHeight 480
 
@@ -28,6 +30,7 @@ int inputs[] = {0, 0, 0, 0, 0, 0};
 
 int main(void)
 {
+
     double playerX = 4.5, playerY = 2.5;
     double dirX = -1, dirY = 0;
     double planeX = 0, planeY = 0.66;
@@ -44,7 +47,6 @@ int main(void)
         inputs[5] = IsKeyDown(KEY_RIGHT) ? 1 : 0;
 
         BeginDrawing();
-
         ClearBackground(BLANK);
 
         for (int x = 0; x <= screenWidth; x++)
@@ -144,9 +146,14 @@ int main(void)
             }
 
             DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
+            // DrawLine(x, drawStart, x, drawEnd, ColorFromHSV(x,1,1));
         }
 
         EndDrawing();
+
+        double deltaTime = GetFrameTime();
+        // printf("%f\n", deltaTime);
+        printf("%i\n", GetFPS());
     }
 
     CloseWindow();
