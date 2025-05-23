@@ -221,7 +221,8 @@ int main(void)
         }
 
         // rotate left
-        if (inputs[4]) {
+        if (inputs[4])
+        {
             double oldDirX = dirX;
             dirX = dirX * cos(rotateSpeed) - dirY * sin(rotateSpeed);
             dirY = oldDirX * sin(rotateSpeed) + dirY * cos(rotateSpeed);
@@ -231,7 +232,8 @@ int main(void)
         }
 
         // rotate right
-        if (inputs[5]) {
+        if (inputs[5])
+        {
             double oldDirX = dirX;
             dirX = dirX * cos(-rotateSpeed) - dirY * sin(-rotateSpeed);
             dirY = oldDirX * sin(-rotateSpeed) + dirY * cos(-rotateSpeed);
