@@ -154,6 +154,91 @@ int main(void)
         double deltaTime = GetFrameTime();
         // printf("%f\n", deltaTime);
         printf("%i\n", GetFPS());
+
+        double moveSpeed = deltaTime * 5.0;
+        double rotateSpeed = deltaTime * 3.0;
+
+        double diagonalPenalty = 0.708;
+
+        if (inputs[0] && inputs[1] && !inputs[2] && !inputs[3] ||
+            inputs[0] && !inputs[1] && !inputs[2] && inputs[3] ||
+            !inputs[0] && inputs[1] && inputs[2] && !inputs[3] ||
+            !inputs[0] && !inputs[1] && inputs[2] && inputs[3])
+        {
+            moveSpeed = moveSpeed * diagonalPenalty;
+        }
+
+        // forward
+        if (inputs[0])
+        {
+            if (map[(int)floor(playerX + dirX * moveSpeed)][(int)floor(playerY)] == 0)
+            {
+                playerX += dirX * moveSpeed;
+            }
+            if (map[(int)floor(playerX)][(int)floor(playerY + dirY * moveSpeed)] == 0)
+            {
+                playerY += dirY * moveSpeed;
+            }
+        }
+
+        // left
+        if (inputs[1])
+        {
+            if (map[(int)floor(playerX - dirY * moveSpeed)][(int)floor(playerY)] == 0)
+            {
+                playerX -= dirY * moveSpeed;
+            }
+            if (map[(int)floor(playerX)][(int)floor(playerY + dirX * moveSpeed)] == 0)
+            {
+                playerY += dirX * moveSpeed;
+            }
+        }
+
+        // backward
+        if (inputs[2])
+        {
+            if (map[(int)floor(playerX - dirX * moveSpeed)][(int)floor(playerY)] == 0)
+            {
+                playerX -= dirX * moveSpeed;
+            }
+            if (map[(int)floor(playerX)][(int)floor(playerY - dirY * moveSpeed)] == 0)
+            {
+                playerY -= dirY * moveSpeed;
+            }
+        }
+
+        // right
+        if (inputs[3])
+        {
+            if (map[(int)floor(playerX + dirY * moveSpeed)][(int)floor(playerY)] == 0)
+            {
+                playerX += dirY * moveSpeed;
+            }
+            if (map[(int)floor(playerX)][(int)floor(playerY - dirX * moveSpeed)] == 0)
+            {
+                playerY -= dirX * moveSpeed;
+            }
+        }
+
+        // rotate left
+        if (inputs[4]) {
+            double oldDirX = dirX;
+            dirX = dirX * cos(rotateSpeed) - dirY * sin(rotateSpeed);
+            dirY = oldDirX * sin(rotateSpeed) + dirY * cos(rotateSpeed);
+            double oldPlaneX = planeX;
+            planeX = planeX * cos(rotateSpeed) - planeY * sin(rotateSpeed);
+            planeY = oldPlaneX * sin(rotateSpeed) + planeY * cos(rotateSpeed);
+        }
+
+        // rotate right
+        if (inputs[5]) {
+            double oldDirX = dirX;
+            dirX = dirX * cos(-rotateSpeed) - dirY * sin(-rotateSpeed);
+            dirY = oldDirX * sin(-rotateSpeed) + dirY * cos(-rotateSpeed);
+            double oldPlaneX = planeX;
+            planeX = planeX * cos(-rotateSpeed) - planeY * sin(-rotateSpeed);
+            planeY = oldPlaneX * sin(-rotateSpeed) + planeY * cos(-rotateSpeed);
+        }
     }
 
     CloseWindow();
