@@ -6,18 +6,19 @@
 #define screenWidth 640
 #define screenHeight 480
 
-#define mapHeight 8
-#define mapWidth 8
+#define mapHeight 9
+#define mapWidth 9
 
 int map[mapHeight][mapWidth] = {
-    {1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 2, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 2, 0, 1},
-    {1, 0, 0, 0, 0, 2, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 2, 2, 2, 1},
-    {1, 2, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 2, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
 int wallColors[][3] = {
@@ -31,9 +32,12 @@ int inputs[] = {0, 0, 0, 0, 0, 0};
 int main(void)
 {
 
-    double playerX = 4.5, playerY = 2.5;
-    double dirX = -1, dirY = 0;
-    double planeX = 0, planeY = 0.66;
+    // double playerX = 4.5, playerY = 3.5;
+    // double dirX = -1, dirY = 0;
+    // double planeX = 0, planeY = 0.66;
+    double playerX = 6.498327, playerY = 3.731397;
+    double dirX = -0.762994, dirY = 0.646406;
+    double planeX = 0.426628, planeY = 0.503576;
 
     InitWindow(screenWidth, screenHeight, "raycaster");
 
@@ -153,7 +157,9 @@ int main(void)
 
         double deltaTime = GetFrameTime();
         // printf("%f\n", deltaTime);
-        printf("%i\n", GetFPS());
+        // printf("%i\n", GetFPS);
+        // printf("%f\n", playerX);
+        printf("%f %f %f %f %f %f\n", playerX,playerY,dirX,dirY,planeX,planeY);
 
         double moveSpeed = deltaTime * 5.0;
         double rotateSpeed = deltaTime * 3.0;
