@@ -9,6 +9,8 @@
 #define mapHeight 9
 #define mapWidth 9
 
+#define playerSize .04
+
 int map[mapHeight][mapWidth] = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -156,9 +158,7 @@ int main(void)
         EndDrawing();
 
         double deltaTime = GetFrameTime();
-        // printf("%f\n", deltaTime);
         // printf("%i\n", GetFPS);
-        // printf("%f\n", playerX);
         printf("%f %f %f %f %f %f\n", playerX,playerY,dirX,dirY,planeX,planeY);
 
         double moveSpeed = deltaTime * 5.0;
@@ -177,11 +177,17 @@ int main(void)
         // forward
         if (inputs[0])
         {
-            if (map[(int)floor(playerX + dirX * moveSpeed)][(int)floor(playerY)] == 0)
+            if (map[(int)floor((playerX + playerSize) + dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX + playerSize) + dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) + dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) + dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
             {
                 playerX += dirX * moveSpeed;
             }
-            if (map[(int)floor(playerX)][(int)floor(playerY + dirY * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) + dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) + dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) + dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) + dirY * moveSpeed)] == 0)
             {
                 playerY += dirY * moveSpeed;
             }
@@ -190,11 +196,17 @@ int main(void)
         // left
         if (inputs[1])
         {
-            if (map[(int)floor(playerX - dirY * moveSpeed)][(int)floor(playerY)] == 0)
+            if (map[(int)floor((playerX + playerSize) - dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX + playerSize) - dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) - dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) - dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
             {
                 playerX -= dirY * moveSpeed;
             }
-            if (map[(int)floor(playerX)][(int)floor(playerY + dirX * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) + dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) + dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) + dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) + dirX * moveSpeed)] == 0)
             {
                 playerY += dirX * moveSpeed;
             }
@@ -203,11 +215,17 @@ int main(void)
         // backward
         if (inputs[2])
         {
-            if (map[(int)floor(playerX - dirX * moveSpeed)][(int)floor(playerY)] == 0)
+            if (map[(int)floor((playerX + playerSize) - dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX + playerSize) - dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) - dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) - dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
             {
                 playerX -= dirX * moveSpeed;
             }
-            if (map[(int)floor(playerX)][(int)floor(playerY - dirY * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) - dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) - dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) - dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) - dirY * moveSpeed)] == 0)
             {
                 playerY -= dirY * moveSpeed;
             }
@@ -216,11 +234,17 @@ int main(void)
         // right
         if (inputs[3])
         {
-            if (map[(int)floor(playerX + dirY * moveSpeed)][(int)floor(playerY)] == 0)
+            if (map[(int)floor((playerX + playerSize) + dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX + playerSize) + dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) + dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
+                map[(int)floor((playerX - playerSize) + dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
             {
                 playerX += dirY * moveSpeed;
             }
-            if (map[(int)floor(playerX)][(int)floor(playerY - dirX * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) - dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) - dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) - dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) - dirX * moveSpeed)] == 0)
             {
                 playerY -= dirX * moveSpeed;
             }
