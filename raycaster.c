@@ -6,6 +6,8 @@
 #define screenWidth 640
 #define screenHeight 480
 
+#define rayDensity 1
+
 #define mapHeight 9
 #define mapWidth 9
 
@@ -34,15 +36,13 @@ int inputs[] = {0, 0, 0, 0, 0, 0};
 int main(void)
 {
 
-    // double playerX = 4.5, playerY = 3.5;
-    // double dirX = -1, dirY = 0;
-    // double planeX = 0, planeY = 0.66;
-    double playerX = 6.498327, playerY = 3.731397;
-    double dirX = -0.762994, dirY = 0.646406;
-    double planeX = 0.426628, planeY = 0.503576;
+    double playerX = 4.5, playerY = 3.5;
+    double dirX = -1, dirY = 0;
+    double planeX = 0, planeY = 0.66;
 
     InitWindow(screenWidth, screenHeight, "raycaster");
 
+    double rainbow = 0;
     while (!WindowShouldClose())
     {
         inputs[0] = IsKeyDown(KEY_W) ? 1 : 0;
@@ -55,9 +55,11 @@ int main(void)
         BeginDrawing();
         ClearBackground(BLANK);
 
-        for (int x = 0; x <= screenWidth; x++)
+        rainbow += .01;
+
+        for (int x = 0; x <= screenWidth / rayDensity; x++)
         {
-            double cameraX = 2 * x / (double)screenWidth - 1;
+            double cameraX = 2 * x / (double)(screenWidth / rayDensity) - 1;
             double rayDirX = dirX + planeX * cameraX;
             double rayDirY = dirY + planeY * cameraX;
 
@@ -151,15 +153,26 @@ int main(void)
                 color[2] = color[2] * .8;
             }
 
-            DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
-            // DrawLine(x, drawStart, x, drawEnd, ColorFromHSV(x,1,1));
+            // if (rayDensity == 1)
+            // {
+                // DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
+            // }
+            // else
+            // {
+            //     for (int i = 0; i < rayDensity; i++)
+            //     {
+            //         DrawLine(x * rayDensity + i, drawStart, x * rayDensity + i, drawEnd, (Color){color[0], color[1], color[2], 255});
+            //     }
+            // }
+
+            DrawLine(x, drawStart, x, drawEnd, ColorFromHSV(rainbow+(double)x,1,1));
         }
 
         EndDrawing();
 
         double deltaTime = GetFrameTime();
-        // printf("%i\n", GetFPS);
-        printf("%f %f %f %f %f %f\n", playerX,playerY,dirX,dirY,planeX,planeY);
+        printf("fps: %i\n", GetFPS());
+        // printf("%f %f %f %f %f %f\n", playerX,playerY,dirX,dirY,planeX,planeY);
 
         double moveSpeed = deltaTime * 5.0;
         double rotateSpeed = deltaTime * 3.0;
@@ -272,6 +285,9 @@ int main(void)
             planeY = oldPlaneX * sin(-rotateSpeed) + planeY * cos(-rotateSpeed);
         }
     }
+
+    goto a;
+    a:
 
     CloseWindow();
 
