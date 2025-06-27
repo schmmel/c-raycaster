@@ -1,4 +1,4 @@
-raycaster made in c using raylib
+raycaster made in c using [raylib](https://www.raylib.com/)
 
 math based on [https://lodev.org/cgtutor/raycasting.html](https://lodev.org/cgtutor/raycasting.html)
 
