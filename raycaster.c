@@ -36,16 +36,27 @@ int inputs[] = {0, 0, 0, 0, 0, 0};
 int main(void)
 {
 
+    int windowWidth = screenWidth, windowHeight = screenHeight;
+
     double playerX = 4.5, playerY = 3.5;
     double dirX = -1, dirY = 0;
     double planeX = 0, planeY = 0.66;
 
     double rainbow = 0;
 
-    InitWindow(screenWidth, screenHeight, "raycaster");
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(windowWidth, windowHeight, "raycaster");
 
     while (!WindowShouldClose())
     {
+        // if window was resized previous frame update values used for casting rays
+        if (IsWindowResized())
+        {
+            windowWidth = GetScreenWidth();
+            windowHeight = windowWidth * 3 / 4;
+            // windowHeight = GetScreenHeight();
+        }
+
         inputs[0] = IsKeyDown(KEY_W) ? 1 : 0;
         inputs[1] = IsKeyDown(KEY_A) ? 1 : 0;
         inputs[2] = IsKeyDown(KEY_S) ? 1 : 0;
@@ -56,9 +67,9 @@ int main(void)
         BeginDrawing();
         ClearBackground(BLANK);
 
-        for (int x = 0; x <= screenWidth / rayDensity; x++)
+        for (int x = 0; x <= windowWidth / rayDensity; x++)
         {
-            double cameraX = 2 * x / (double)(screenWidth / rayDensity) - 1;
+            double cameraX = 2 * x / (double)(windowWidth / rayDensity) - 1;
             double rayDirX = dirX + planeX * cameraX;
             double rayDirY = dirY + planeY * cameraX;
 
@@ -130,18 +141,18 @@ int main(void)
                 perpWallDist = (sideDistY - deltaDistY);
             }
 
-            int lineHeight = (int)(screenHeight / perpWallDist);
+            int lineHeight = (int)(windowHeight / perpWallDist);
 
-            int drawStart = -lineHeight / 2 + screenHeight / 2;
+            int drawStart = -lineHeight / 2 + windowHeight / 2;
             if (drawStart < 0)
             {
                 drawStart = 0;
             }
 
-            int drawEnd = lineHeight / 2 + screenHeight / 2;
-            if (drawEnd >= screenHeight)
+            int drawEnd = lineHeight / 2 + windowHeight / 2;
+            if (drawEnd >= windowHeight)
             {
-                drawEnd = screenHeight - 1;
+                drawEnd = windowHeight - 1;
             }
 
             if (hit == 9)
