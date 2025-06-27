@@ -18,7 +18,7 @@ int map[mapHeight][mapWidth] = {
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 2, 0, 0, 0, 1},
+    {1, 0, 0, 0, 9, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -40,9 +40,10 @@ int main(void)
     double dirX = -1, dirY = 0;
     double planeX = 0, planeY = 0.66;
 
+    double rainbow = 0;
+
     InitWindow(screenWidth, screenHeight, "raycaster");
 
-    double rainbow = 0;
     while (!WindowShouldClose())
     {
         inputs[0] = IsKeyDown(KEY_W) ? 1 : 0;
@@ -54,8 +55,6 @@ int main(void)
 
         BeginDrawing();
         ClearBackground(BLANK);
-
-        rainbow += .01;
 
         for (int x = 0; x <= screenWidth / rayDensity; x++)
         {
@@ -138,34 +137,40 @@ int main(void)
             {
                 drawStart = 0;
             }
+
             int drawEnd = lineHeight / 2 + screenHeight / 2;
             if (drawEnd >= screenHeight)
             {
                 drawEnd = screenHeight - 1;
             }
 
-            int color[] = {wallColors[hit - 1][0], wallColors[hit - 1][1], wallColors[hit - 1][2]};
-
-            if (side)
+            if (hit == 9)
             {
-                color[0] = color[0] * .8;
-                color[1] = color[1] * .8;
-                color[2] = color[2] * .8;
+                DrawLine(x, drawStart, x, drawEnd, ColorFromHSV(rainbow, 1, 1));
             }
+            else
+            {
+                int color[] = {wallColors[hit - 1][0], wallColors[hit - 1][1], wallColors[hit - 1][2]};
 
-            // if (rayDensity == 1)
-            // {
-                // DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
-            // }
-            // else
-            // {
-            //     for (int i = 0; i < rayDensity; i++)
-            //     {
-            //         DrawLine(x * rayDensity + i, drawStart, x * rayDensity + i, drawEnd, (Color){color[0], color[1], color[2], 255});
-            //     }
-            // }
+                if (side)
+                {
+                    color[0] = color[0] * .8;
+                    color[1] = color[1] * .8;
+                    color[2] = color[2] * .8;
+                }
 
-            DrawLine(x, drawStart, x, drawEnd, ColorFromHSV(rainbow+(double)x,1,1));
+                // if (rayDensity == 1)
+                // {
+                DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
+                // }
+                // else
+                // {
+                //     for (int i = 0; i < rayDensity; i++)
+                //     {
+                //         DrawLine(x * rayDensity + i, drawStart, x * rayDensity + i, drawEnd, (Color){color[0], color[1], color[2], 255});
+                //     }
+                // }
+            }
         }
 
         EndDrawing();
@@ -173,6 +178,8 @@ int main(void)
         double deltaTime = GetFrameTime();
         printf("fps: %i\n", GetFPS());
         // printf("%f %f %f %f %f %f\n", playerX,playerY,dirX,dirY,planeX,planeY);
+
+        rainbow += deltaTime * 64;
 
         double moveSpeed = deltaTime * 5.0;
         double rotateSpeed = deltaTime * 3.0;
@@ -287,7 +294,7 @@ int main(void)
     }
 
     goto a;
-    a:
+a:
 
     CloseWindow();
 
