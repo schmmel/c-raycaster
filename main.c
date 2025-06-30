@@ -3,17 +3,17 @@
 
 #include <stdio.h>
 
-#define screenWidth 640
-#define screenHeight 480
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
-#define rayDensity 1
+#define RAY_DENSITY 1
 
-#define mapHeight 9
-#define mapWidth 9
+#define MAP_HEIGHT 9
+#define MAP_WIDTH 9
 
-#define playerSize .04
+#define PLAYER_SIZE .04
 
-int map[mapHeight][mapWidth] = {
+int map[MAP_HEIGHT][MAP_WIDTH] = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -30,13 +30,22 @@ int wallColors[][3] = {
     {223, 12, 68},
 };
 
-// w, a, s, d, arrow left, arrow right
-int inputs[] = {0, 0, 0, 0, 0, 0};
+struct InputStruct
+{
+    int w;
+    int a;
+    int s;
+    int d;
+    int left;
+    int right;
+};
+
 
 int main(void)
 {
+    struct InputStruct inputs = {0, 0, 0, 0, 0, 0};
 
-    int windowWidth = screenWidth, windowHeight = screenHeight;
+    int windowWidth = SCREEN_WIDTH, windowHeight = SCREEN_HEIGHT;
 
     double playerX = 4.5, playerY = 3.5;
     double dirX = -1, dirY = 0;
@@ -57,19 +66,19 @@ int main(void)
             // windowHeight = GetScreenHeight();
         }
 
-        inputs[0] = IsKeyDown(KEY_W) ? 1 : 0;
-        inputs[1] = IsKeyDown(KEY_A) ? 1 : 0;
-        inputs[2] = IsKeyDown(KEY_S) ? 1 : 0;
-        inputs[3] = IsKeyDown(KEY_D) ? 1 : 0;
-        inputs[4] = IsKeyDown(KEY_LEFT) ? 1 : 0;
-        inputs[5] = IsKeyDown(KEY_RIGHT) ? 1 : 0;
+        inputs.w = IsKeyDown(KEY_W) ? 1 : 0;
+        inputs.a = IsKeyDown(KEY_A) ? 1 : 0;
+        inputs.s = IsKeyDown(KEY_S) ? 1 : 0;
+        inputs.d = IsKeyDown(KEY_D) ? 1 : 0;
+        inputs.left = IsKeyDown(KEY_LEFT) ? 1 : 0;
+        inputs.right = IsKeyDown(KEY_RIGHT) ? 1 : 0;
 
         BeginDrawing();
         ClearBackground(BLANK);
 
-        for (int x = 0; x <= windowWidth / rayDensity; x++)
+        for (int x = 0; x <= windowWidth / RAY_DENSITY; x++)
         {
-            double cameraX = 2 * x / (double)(windowWidth / rayDensity) - 1;
+            double cameraX = 2 * x / (double)(windowWidth / RAY_DENSITY) - 1;
             double rayDirX = dirX + planeX * cameraX;
             double rayDirY = dirY + planeY * cameraX;
 
@@ -170,15 +179,15 @@ int main(void)
                     color[2] = color[2] * .8;
                 }
 
-                // if (rayDensity == 1)
+                // if (RAY_DENSITY == 1)
                 // {
                 DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
                 // }
                 // else
                 // {
-                //     for (int i = 0; i < rayDensity; i++)
+                //     for (int i = 0; i < RAY_DENSITY; i++)
                 //     {
-                //         DrawLine(x * rayDensity + i, drawStart, x * rayDensity + i, drawEnd, (Color){color[0], color[1], color[2], 255});
+                //         DrawLine(x * RAY_DENSITY + i, drawStart, x * RAY_DENSITY + i, drawEnd, (Color){color[0], color[1], color[2], 255});
                 //     }
                 // }
             }
@@ -197,92 +206,93 @@ int main(void)
 
         double diagonalPenalty = 0.708;
 
-        if (inputs[0] && inputs[1] && !inputs[2] && !inputs[3] ||
-            inputs[0] && !inputs[1] && !inputs[2] && inputs[3] ||
-            !inputs[0] && inputs[1] && inputs[2] && !inputs[3] ||
-            !inputs[0] && !inputs[1] && inputs[2] && inputs[3])
+        // apply movement penalty if 2 
+        if (inputs.w && inputs.a && !inputs.s && !inputs.d ||
+            inputs.w && !inputs.a && !inputs.s && inputs.d ||
+            !inputs.w && inputs.a && inputs.s && !inputs.d ||
+            !inputs.w && !inputs.a && inputs.s && inputs.d)
         {
             moveSpeed = moveSpeed * diagonalPenalty;
         }
 
         // forward
-        if (inputs[0])
+        if (inputs.w)
         {
-            if (map[(int)floor((playerX + playerSize) + dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX + playerSize) + dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) + dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) + dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
+            if (map[(int)floor((playerX + PLAYER_SIZE) + dirX * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX + PLAYER_SIZE) + dirX * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) + dirX * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) + dirX * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0)
             {
                 playerX += dirX * moveSpeed;
             }
-            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) + dirY * moveSpeed)] == 0 &&
-                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) + dirY * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) + dirY * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) + dirY * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) + dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) + dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) + dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) + dirY * moveSpeed)] == 0)
             {
                 playerY += dirY * moveSpeed;
             }
         }
 
         // left
-        if (inputs[1])
+        if (inputs.a)
         {
-            if (map[(int)floor((playerX + playerSize) - dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX + playerSize) - dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) - dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) - dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
+            if (map[(int)floor((playerX + PLAYER_SIZE) - dirY * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX + PLAYER_SIZE) - dirY * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) - dirY * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) - dirY * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0)
             {
                 playerX -= dirY * moveSpeed;
             }
-            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) + dirX * moveSpeed)] == 0 &&
-                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) + dirX * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) + dirX * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) + dirX * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) + dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) + dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) + dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) + dirX * moveSpeed)] == 0)
             {
                 playerY += dirX * moveSpeed;
             }
         }
 
         // backward
-        if (inputs[2])
+        if (inputs.s)
         {
-            if (map[(int)floor((playerX + playerSize) - dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX + playerSize) - dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) - dirX * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) - dirX * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
+            if (map[(int)floor((playerX + PLAYER_SIZE) - dirX * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX + PLAYER_SIZE) - dirX * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) - dirX * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) - dirX * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0)
             {
                 playerX -= dirX * moveSpeed;
             }
-            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) - dirY * moveSpeed)] == 0 &&
-                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) - dirY * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) - dirY * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) - dirY * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) - dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) - dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) - dirY * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) - dirY * moveSpeed)] == 0)
             {
                 playerY -= dirY * moveSpeed;
             }
         }
 
         // right
-        if (inputs[3])
+        if (inputs.d)
         {
-            if (map[(int)floor((playerX + playerSize) + dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX + playerSize) + dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) + dirY * moveSpeed)][(int)floor(playerY + playerSize)] == 0 &&
-                map[(int)floor((playerX - playerSize) + dirY * moveSpeed)][(int)floor(playerY - playerSize)] == 0)
+            if (map[(int)floor((playerX + PLAYER_SIZE) + dirY * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX + PLAYER_SIZE) + dirY * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) + dirY * moveSpeed)][(int)floor(playerY + PLAYER_SIZE)] == 0 &&
+                map[(int)floor((playerX - PLAYER_SIZE) + dirY * moveSpeed)][(int)floor(playerY - PLAYER_SIZE)] == 0)
             {
                 playerX += dirY * moveSpeed;
             }
-            if (map[(int)floor(playerX + playerSize)][(int)floor((playerY + playerSize) - dirX * moveSpeed)] == 0 &&
-                map[(int)floor(playerX + playerSize)][(int)floor((playerY - playerSize) - dirX * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY + playerSize) - dirX * moveSpeed)] == 0 &&
-                map[(int)floor(playerX - playerSize)][(int)floor((playerY - playerSize) - dirX * moveSpeed)] == 0)
+            if (map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) - dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX + PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) - dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY + PLAYER_SIZE) - dirX * moveSpeed)] == 0 &&
+                map[(int)floor(playerX - PLAYER_SIZE)][(int)floor((playerY - PLAYER_SIZE) - dirX * moveSpeed)] == 0)
             {
                 playerY -= dirX * moveSpeed;
             }
         }
 
         // rotate left
-        if (inputs[4])
+        if (inputs.left)
         {
             double oldDirX = dirX;
             dirX = dirX * cos(rotateSpeed) - dirY * sin(rotateSpeed);
@@ -293,7 +303,7 @@ int main(void)
         }
 
         // rotate right
-        if (inputs[5])
+        if (inputs.right)
         {
             double oldDirX = dirX;
             dirX = dirX * cos(-rotateSpeed) - dirY * sin(-rotateSpeed);
@@ -303,9 +313,6 @@ int main(void)
             planeY = oldPlaneX * sin(-rotateSpeed) + planeY * cos(-rotateSpeed);
         }
     }
-
-    goto a;
-a:
 
     CloseWindow();
 

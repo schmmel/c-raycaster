@@ -1,2 +1,2 @@
 raylib:
-	gcc -o build/raycaster raycaster.c -l raylib -lm
+	gcc -o build/raycaster main.c -l raylib -lm
