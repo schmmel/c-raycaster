@@ -40,12 +40,12 @@ struct InputStruct
     int right;
 };
 
-
 int main(void)
 {
     struct InputStruct inputs = {0, 0, 0, 0, 0, 0};
 
-    int windowWidth = SCREEN_WIDTH, windowHeight = SCREEN_HEIGHT;
+    int renderWidth = SCREEN_WIDTH, renderHeight = SCREEN_HEIGHT;
+    int windowHeight = SCREEN_HEIGHT;
 
     double playerX = 4.5, playerY = 3.5;
     double dirX = -1, dirY = 0;
@@ -54,16 +54,16 @@ int main(void)
     double rainbow = 0;
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(windowWidth, windowHeight, "raycaster");
+    InitWindow(renderWidth, renderHeight, "raycaster");
 
     while (!WindowShouldClose())
     {
         // if window was resized previous frame update values used for casting rays
         if (IsWindowResized())
         {
-            windowWidth = GetScreenWidth();
-            windowHeight = windowWidth * 3 / 4;
-            // windowHeight = GetScreenHeight();
+            renderWidth = GetScreenWidth();
+            renderHeight = renderWidth * 3 / 4;
+            windowHeight = GetScreenHeight();
         }
 
         inputs.w = IsKeyDown(KEY_W) ? 1 : 0;
@@ -76,9 +76,9 @@ int main(void)
         BeginDrawing();
         ClearBackground(BLANK);
 
-        for (int x = 0; x <= windowWidth / RAY_DENSITY; x++)
+        for (int x = 0; x <= renderWidth / RAY_DENSITY; x++)
         {
-            double cameraX = 2 * x / (double)(windowWidth / RAY_DENSITY) - 1;
+            double cameraX = 2 * x / (double)(renderWidth / RAY_DENSITY) - 1;
             double rayDirX = dirX + planeX * cameraX;
             double rayDirY = dirY + planeY * cameraX;
 
@@ -150,15 +150,15 @@ int main(void)
                 perpWallDist = (sideDistY - deltaDistY);
             }
 
-            int lineHeight = (int)(windowHeight / perpWallDist);
+            int lineHeight = (int)(renderHeight / perpWallDist);
 
-            int drawStart = -lineHeight / 2 + windowHeight / 2;
+            int drawStart = -lineHeight / 2 + renderHeight / 2;
             if (drawStart < 0)
             {
                 drawStart = 0;
             }
 
-            int drawEnd = lineHeight / 2 + windowHeight / 2;
+            int drawEnd = lineHeight / 2 + renderHeight / 2;
             if (drawEnd >= windowHeight)
             {
                 drawEnd = windowHeight - 1;
@@ -182,6 +182,7 @@ int main(void)
                 // if (RAY_DENSITY == 1)
                 // {
                 DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
+                printf("%d %d\n", drawStart, drawEnd);
                 // }
                 // else
                 // {
@@ -193,10 +194,11 @@ int main(void)
             }
         }
 
+        DrawFPS(0, 0);
+
         EndDrawing();
 
         double deltaTime = GetFrameTime();
-        printf("fps: %i\n", GetFPS());
         // printf("%f %f %f %f %f %f\n", playerX,playerY,dirX,dirY,planeX,planeY);
 
         rainbow += deltaTime * 64;
