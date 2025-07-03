@@ -152,13 +152,13 @@ int main(void)
 
             int lineHeight = (int)(renderHeight / perpWallDist);
 
-            int drawStart = -lineHeight / 2 + renderHeight / 2;
+            int drawStart = -lineHeight / 2 + windowHeight / 2;
             if (drawStart < 0)
             {
                 drawStart = 0;
             }
 
-            int drawEnd = lineHeight / 2 + renderHeight / 2;
+            int drawEnd = lineHeight / 2 + windowHeight / 2;
             if (drawEnd >= windowHeight)
             {
                 drawEnd = windowHeight - 1;
@@ -182,7 +182,6 @@ int main(void)
                 // if (RAY_DENSITY == 1)
                 // {
                 DrawLine(x, drawStart, x, drawEnd, (Color){color[0], color[1], color[2], 255});
-                printf("%d %d\n", drawStart, drawEnd);
                 // }
                 // else
                 // {
